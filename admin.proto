@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package storage_lock.admin.v1;
+
+option go_package = "github.com/storage-lock/storage-lock-grpc-api/gen;adminv1";
+
+// Admin 只提供查询。没有强制解锁，删除墓碑会回退 fencing token。
+service Admin {
+  rpc ListLocks(ListLocksRequest) returns (ListLocksResponse);
+  rpc GetLock(GetLockRequest) returns (Lock);
+}
+
+message ListLocksRequest {}
+
+message ListLocksResponse {
+  repeated Lock locks = 1;
+}
+
+message GetLockRequest {
+  string lock_id = 1;
+}
+
+message Lock {
+  string lock_id = 1;
+  string owner_id = 2;
+  bool held = 3;
+  bool read_lock = 4;
+  int32 lock_count = 5;
+  uint64 version = 6;
+  string remaining_lease = 7;
+  string write_intent_owner = 8;
+  repeated Waiter waiters = 9;
+}
+
+message Waiter {
+  string owner_id = 1;
+  string mode = 2;
+}
